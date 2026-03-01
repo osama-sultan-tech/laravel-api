@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
 use App\Http\Resources\v1\CustomerResource;
 use App\Http\Resources\v1\CustomerCollection;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 
 
@@ -24,20 +25,19 @@ class CustomerController extends Controller
     {
 
         $filter = new CustomersFilter();
-        $queryItems = $filter->transform($request);
+        $filterItems = $filter->transform($request);
 
-        if (count($queryItems) == 0) {
+        $includeInvoices = $request->query('includeInvoices');
 
-            return new CustomerCollection(Customer::paginate());
+        $customers = Customer::where($filterItems);
+            if($includeInvoices) {
+                $customers = $customers->with('invoices');
+            }
 
-        } else {
 
-            $customer = Customer::where($queryItems)->paginate();
-            return new CustomerCollection($customer->appends($request->query()));
+        return new CustomerCollection($customers->paginate()->appends($request->query()));
 
-//            return new CustomerCollection(Customer::where($queryItems)->paginate());
 
-        }
 
     }
 
@@ -66,10 +66,16 @@ class CustomerController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Customer  $customer
-     * @return \Illuminate\Http\Response
+     * @return CustomerResource
      */
     public function show(Customer $customer)
     {
+        $includeInvoices = request()->query('includeInvoices');
+
+        if ($includeInvoices) {
+            return new CustomerResource($customer->loadMissing('invoices'));
+        }
+
         return new CustomerResource($customer);
     }
 
