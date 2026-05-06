@@ -4,14 +4,12 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Filters\V1\CustomersFilter;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCustomerRequest;
-use App\Http\Requests\UpdateCustomerRequest;
-use App\Models\Customer;
-use App\Http\Resources\v1\CustomerResource;
+use App\Http\Requests\V1\StoreCustomerRequest;
+use App\Http\Requests\V1\UpdateCustomerRequest;
 use App\Http\Resources\v1\CustomerCollection;
-use App\Models\Invoice;
+use App\Http\Resources\v1\CustomerResource;
+use App\Models\Customer;
 use Illuminate\Http\Request;
-
 
 
 class CustomerController extends Controller
@@ -54,12 +52,12 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreCustomerRequest  $request
+     * @param  \App\Http\Requests\V1\StoreCustomerRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreCustomerRequest $request)
     {
-        //
+        return new CustomerResource(Customer::create($request->all()));
     }
 
     /**
@@ -93,13 +91,13 @@ class CustomerController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateCustomerRequest  $request
+     * @param  \App\Http\Requests\V1\UpdateCustomerRequest  $request
      * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        //
+        $customer->update($request->all());
     }
 
     /**
